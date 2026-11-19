@@ -284,3 +284,19 @@ div.item-main { cursor: default; }
 .btn-text-danger { color: var(--danger); }
 .list-heading { font-size: 15px; margin: 16px 0 8px; }
 .notices { position: absolute; inset-inline: 0; top: 0; z-index: 5; }
+.data-section { display: grid; gap: 8px; margin-bottom: 16px; }
+.data-section h3 { margin: 0; font-size: 15px; }
+.data-section p { margin: 0; line-height: 1.6; overflow-wrap: anywhere; }
+.status-line { font-weight: 600; }
+.status-failed, .status-conflict { color: var(--danger); }
+.warn { color: var(--danger); font-weight: 600; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.confirm-box { display: grid; gap: 6px; padding: 8px 10px; border: 1px dashed var(--control-border); border-radius: 8px; }
+.check { cursor: pointer; }
+.check input { width: 20px; height: 20px; }
+.dlg-foot .grow { flex: 1; min-width: 0; }
+button.ann-item.candidate { width: 100%; text-align: start; background: none; cursor: pointer; font: inherit; color: inherit; }
+button.ann-item.candidate:hover { border-color: var(--accent); }
+.cand-context { font-family: var(--font-body); line-height: 1.6; overflow-wrap: anywhere; }
+.cand-context mark { background: var(--preview); color: inherit; }
+.list-status { margin: 0 0 8px; color: var(--muted); }

@@ -19,7 +19,7 @@ export async function watch(page: Page) {
 }
 
 export async function openFile(page: Page, file: string) {
-  await page.locator('input[type=file]').setInputFiles(file);
+  await page.getByTestId('open-manuscript').setInputFiles(file);
   await expect(page.locator('.strip').first()).toBeAttached();
   await page.waitForFunction(() => !!(window as unknown as { __reader?: unknown }).__reader);
 }
