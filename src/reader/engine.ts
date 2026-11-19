@@ -96,7 +96,8 @@ export class ReaderEngine {
 
   private layoutTimer = 0;
   requestLayout(force = false): void {
-    if (this.layoutFrozen) {
+    // 入力中は高さだけの変化（キーボード開閉）では再組版しない。幅の変化（回転）は反映する。
+    if (this.layoutFrozen && Math.floor(this.area.clientWidth) === this.pageW) {
       this.pendingLayout = true;
       return;
     }
