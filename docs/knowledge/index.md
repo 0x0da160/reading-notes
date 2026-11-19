@@ -12,6 +12,7 @@ okf_version: "0.2"
 * [保存・書き出し](./persistence.md) - IndexedDB、作業枠、バックアップ、JSONとAI用Markdown。
 * [通信・オフライン・公開](./deployment.md) - 原稿の隔離、現在のタブでの継続、通常タブでの再起動。
 * [検証と合格条件](./verification.md) - 試作、測定、自動試験、Safari実機、リリース判定。
+* [iPhone実機チェックリスト](./device-checklist.md) - 依頼者が行う実機確認の手順と記録欄。
 * [納品物とナレッジ運用](./deliverables.md) - 成果物とOKF v0.2バンドルの維持管理。
 
 # 更新履歴

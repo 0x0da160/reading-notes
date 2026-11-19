@@ -2,6 +2,7 @@
 
 ## 2026-11-19
 
+* 依頼者が記入する[iPhone実機チェックリスト](./device-checklist.md)を加えた（全項目未実施）。
 * アプリの実装を始め、[検証](./verification.md#section-9-4)に読み込み上限の暫定値を記録した（実機未計測）。
 * Modern Web Guidanceと照合し、次を改めた。
   * [通信・オフライン・公開](./deployment.md#section-8)：原稿のDOMをAPIで組み立て直すことと、`<meta>` のCSP（Trusted Typesを含む）で通信とHTML挿入を制限することを定めた。
