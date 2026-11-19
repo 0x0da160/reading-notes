@@ -1,7 +1,9 @@
 *, *::before, *::after { box-sizing: border-box; }
 /* 画面全体は動かさない（iOS Safari の縦スクロール・跳ね返りを止める）。
-   スクロールはダイアログ・パネルの本文など、内側の領域だけで行う。ピンチズームは妨げない。 */
+   スクロールはダイアログ・パネルの本文など、内側の領域だけで行う。
+   ピンチズーム・ダブルタップ拡大も行わない（依頼者の指定）。文字の大きさは設定で変える。 */
 html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; }
+html { touch-action: pan-x pan-y; }
 body {
   background: var(--canvas);
   color: var(--text);

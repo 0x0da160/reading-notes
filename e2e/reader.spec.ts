@@ -176,3 +176,15 @@ test('画面全体は縦にも横にもスクロールしない（本文表示�
   await tryScroll();
   expect(await root()).toMatchObject({ overflow: 0, x: 0, y: 0 });
 });
+
+test('ピンチやダブルタップで拡大しない設定になっている', async ({ page }) => {
+  await page.goto('./');
+  expect(await page.locator('meta[name=viewport]').getAttribute('content')).toContain('maximum-scale=1, user-scalable=no');
+  await expect(page.locator('html')).toHaveCSS('touch-action', 'pan-x pan-y');
+  const prevented = await page.evaluate(() => {
+    const e = new Event('gesturestart', { cancelable: true, bubbles: true });
+    document.body.dispatchEvent(e);
+    return e.defaultPrevented;
+  });
+  expect(prevented).toBe(true);
+});
