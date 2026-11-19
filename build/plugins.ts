@@ -73,10 +73,10 @@ self.addEventListener('fetch', (event) => {
     (async () => {
       const cache = await caches.open(CACHE);
       if (req.mode === 'navigate') {
-        const hit = await cache.match(new URL('./', self.registration.scope));
+        const hit = await cache.match(new URL('./', self.registration.scope), { ignoreVary: true });
         if (hit) return hit;
       }
-      const hit = await cache.match(req, { ignoreSearch: true });
+      const hit = await cache.match(req, { ignoreSearch: true, ignoreVary: true });
       return hit ?? fetch(req);
     })(),
   );

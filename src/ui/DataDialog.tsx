@@ -10,6 +10,7 @@ interface Props {
   /** 書き出したがファイル保存を未確認のスナップショット世代 */
   pendingBackup: number | null;
   count: number;
+  offlineReady: boolean;
   onClose: () => void;
   onExportJson: () => void;
   onConfirmBackup: () => void;
@@ -36,6 +37,7 @@ export function DataDialog(p: Props) {
         <p className={`status-line status-${p.status}`} role="status">
           {STATUS_TEXT[p.status]}
         </p>
+        <p className="small">{p.offlineReady ? 'オフラインで開き直せます' : 'オフラインで開き直す準備はできていません（このタブは通信なしでも動き続けます）'}</p>
         <p className="small muted">ブラウザーの保存は、次に開いたときまで残ることを保証しません。作業を残すにはJSONを書き出して「ファイル」に保存し、元の原稿と一緒に保管してください。</p>
         <p className="small">
           現在の世代：{p.contentRev}　／　ファイル保存を確認したバックアップ：{p.backupRev ?? 'なし'}

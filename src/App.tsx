@@ -743,6 +743,7 @@ export function App() {
           backupRev={work.backupRev}
           pendingBackup={pendingBackup}
           count={annotations.length}
+          offlineReady={offline.ready}
           onClose={() => setDialog(null)}
           onExportJson={() => void exportJson()}
           onConfirmBackup={() => {
