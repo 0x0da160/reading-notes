@@ -1,12 +1,15 @@
+import type { BrowserContext } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import { SAMPLE_EPUB, SAMPLE_MD, highlightSizes, openFile, selectOnPage, watch } from './helpers';
 
 // §8・§9.2：オンラインでは EPUB を一度も開かず、遮断後に初めて開く。
+// 遮断は、ページからのすべての通信を失敗させるルートで表す（Service Worker が返す応答はネットワークに出ない）。
+const cutNetwork = (context: BrowserContext) => context.route('**/*', (r) => r.abort('internetdisconnected'));
 
 test('通常タブ：「オフラインで開き直せる」の後、通信を切って開き直し、初めての EPUB を読んで赤入れできる', async ({ page, context }) => {
   await page.goto('./');
   await expect(page.getByText('オフラインで開き直せます')).toBeVisible({ timeout: 20_000 });
-  await context.setOffline(true);
+  await cutNetwork(context);
   await page.reload();
   await expect(page.getByRole('button', { name: '原稿を開く' })).toBeVisible();
   await openFile(page, SAMPLE_EPUB);
@@ -32,7 +35,7 @@ test.describe('Service Worker なし（プライベートブラウズ相当）',
     await page.goto('./');
     await expect(page.getByRole('button', { name: '原稿を開く' })).toBeVisible();
     const loaded = w.requests.length;
-    await context.setOffline(true);
+    await cutNetwork(context);
     await openFile(page, SAMPLE_EPUB);
     await selectOnPage(page, 0, 4);
     await page.getByRole('button', { name: '赤入れ', exact: true }).click();
