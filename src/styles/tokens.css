@@ -1,0 +1,28 @@
+/* §4.2 OKLCH カラートークン。テーマの切替は color-scheme の指定だけで行う。 */
+:root {
+  color-scheme: light dark;
+  --canvas: light-dark(oklch(.955 .012 82), oklch(.175 .012 255));
+  --paper: light-dark(oklch(.982 .011 85), oklch(.215 .013 255));
+  --surface: light-dark(oklch(.995 .003 85), oklch(.255 .016 255));
+  --text: light-dark(oklch(.245 .020 65), oklch(.925 .013 85));
+  --muted: light-dark(oklch(.460 .023 66), oklch(.745 .022 255));
+  --divider: light-dark(oklch(.880 .017 82), oklch(.340 .022 255));
+  --control-border: light-dark(oklch(.580 .022 76), oklch(.600 .027 255));
+  --accent: light-dark(oklch(.430 .095 240), oklch(.780 .100 236));
+  --on-accent: light-dark(oklch(.990 .004 240), oklch(.200 .022 240));
+  --danger: light-dark(oklch(.450 .130 23), oklch(.800 .095 23));
+  --question: light-dark(oklch(.900 .070 88), oklch(.370 .055 88));
+  --keep: light-dark(oklch(.900 .062 160), oklch(.360 .052 160));
+  --revise: light-dark(oklch(.890 .055 22), oklch(.360 .068 22));
+  --preview: light-dark(oklch(.890 .048 242), oklch(.380 .065 245));
+  --selection: light-dark(oklch(.820 .082 242), oklch(.460 .085 245));
+
+  --font-body: "Hiragino Mincho ProN", "Hiragino Mincho Pro", "YuMincho", "Yu Mincho", "Noto Serif JP", "Noto Serif CJK JP", serif;
+  --font-ui: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --tap: 44px;
+  --radius: 10px;
+  --body-size: 18px;
+  --body-leading: 1.8;
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
