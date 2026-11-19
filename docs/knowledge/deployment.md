@@ -18,4 +18,5 @@ status: draft
 - 通常タブではService Workerのパスとスコープを `/<repo>/` に合わせ、現在の版のService Workerが対象ページを制御し、初回に使うEPUB解析等を含めた必要資産がそろってから「オフラインで開き直せる」と表示する。キャッシュが保持されている状態では、完了後に機内モードで開き直せること。入力・再割り当て中の強制更新を避け、アプリ更新後も原稿・赤入れ・設定・読書位置を復元する。
 - モードを判定せず、Service Workerや永続キャッシュに頼らなくても現在のタブで動き続けるようにする。必須機能はすべて初期バンドルに含まれる（[§2](./architecture.md#section-2)）ため、アプリが表示された時点で追加通信は不要になる。プライベートブラウズでは、アプリ表示後に通信を切っても、同じタブで両形式の原稿を初めて開き、読む・赤入れ・再割り当て・書き出しができること。閉じた後のオフライン再起動と端末内保持は保証しない。
 - GitHub Pagesは応答ヘッダーを設定できないため、本番の `index.html` に `<meta http-equiv="Content-Security-Policy">` で `default-src 'self'; img-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'` を置き、上記の通信制限とHTML挿入の禁止をブラウザーにも強制させる。
+- 版名はsemverのgitタグ `v<major>.<minor>.<patch>` で管理し、`main` への反映ごとに公開のCIが一つ進める（上げ幅はPRのラベル `semver:major`・`semver:minor`、なければパッチ）。公開以外のビルドは「次の版-dev」と表示する。
 - GitHubに置くのはアプリと公開可能なサンプルのみ。私用原稿・赤入れ・バックアップをリポジトリや公開物に入れない。`/<repo>/` はService Workerのスコープであり、IndexedDBの隔離境界ではない。公開先の同一オリジンには信頼できない別アプリを配置しない。混在を避けられない場合は、専用オリジンを用意してから私用原稿を扱う。

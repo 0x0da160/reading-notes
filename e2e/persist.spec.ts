@@ -37,8 +37,8 @@ test('通常タブ：再読み込みで原稿・読書位置・赤入れ・設�
   await openFile(page, SAMPLE_EPUB);
   await gotoChapter(page, '第一章　七階と八階のあいだ');
   await annotate(page, 2, 12, '再読み込み後も残る');
-  await page.getByRole('button', { name: '← 次へ' }).click();
-  await page.getByRole('button', { name: '← 次へ' }).click();
+  await page.getByRole('button', { name: '次へ' }).click();
+  await page.getByRole('button', { name: '次へ' }).click();
   await page.getByRole('button', { name: '設定' }).click();
   await page.getByRole('radio', { name: 'ダーク' }).check();
   await page.keyboard.press('Escape');
@@ -58,7 +58,7 @@ test('JSON：書き出しと、別のブラウザーで同じ原稿を選んで�
   await openFile(page, SAMPLE_EPUB);
   await gotoChapter(page, '第二章　数える者');
   await annotate(page, 1, 9, 'A', '残したい');
-  await page.getByRole('button', { name: '← 次へ' }).click();
+  await page.getByRole('button', { name: '次へ' }).click();
   await annotate(page, 3, 7, 'B', '修正指定');
   const reading = await currentLocation(page);
   const json = await exportJson(page);
@@ -247,7 +247,7 @@ test('位置未確定：本文からページをまたいで選び直し、取�
   await page.getByRole('button', { name: '本文から選び直す' }).click();
   await selectOnPage(page, 4, 9);
   await page.getByRole('button', { name: '範囲を延ばす' }).click();
-  await page.getByRole('button', { name: '← 次', exact: true }).click();
+  await page.getByRole('button', { name: '次へ', exact: true }).click();
   await selectOnPage(page, 2, 6);
   await page.getByRole('button', { name: 'ここまで' }).click();
   const confirm = page.getByRole('dialog', { name: 'この位置に割り当てますか' });

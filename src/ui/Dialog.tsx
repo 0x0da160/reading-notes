@@ -1,4 +1,6 @@
 // ネイティブ <dialog> の showModal() を使う汎用ダイアログ（§2）。Esc で閉じ、閉じると呼び出し元へフォーカスを戻す。
+import { X } from 'lucide-react';
+import { IconButton } from './IconButton';
 import { useEffect, useRef, type ReactNode } from 'react';
 
 interface Props {
@@ -48,9 +50,7 @@ export function Dialog({ open, title, onClose, children, footer, className }: Pr
         <div className="dlg-inner">
           <div className="dlg-head">
             <h2>{title}</h2>
-            <button type="button" className="btn" onClick={() => ref.current?.close()}>
-              閉じる
-            </button>
+            <IconButton icon={X} label="閉じる" onClick={() => ref.current?.close()} />
           </div>
           <div className="dlg-body">{children}</div>
           {footer && <div className="dlg-foot">{footer}</div>}

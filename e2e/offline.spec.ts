@@ -16,8 +16,8 @@ test('通常タブ：「オフラインで開き直せる」の後、通信を�
   await page.reload();
   await expect(page.getByRole('button', { name: '原稿を開く' })).toBeVisible();
   await openFile(page, SAMPLE_EPUB);
-  await page.getByRole('button', { name: '← 次へ' }).click();
-  await page.getByRole('button', { name: '← 次へ' }).click();
+  await page.getByRole('button', { name: '次へ' }).click();
+  await page.getByRole('button', { name: '次へ' }).click();
   await selectOnPage(page, 2, 8);
   await page.getByRole('button', { name: '赤入れ', exact: true }).click();
   await page.getByRole('button', { name: '保存' }).click();

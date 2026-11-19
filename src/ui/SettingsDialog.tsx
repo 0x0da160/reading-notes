@@ -1,4 +1,5 @@
 import { FONT_SIZES, LINE_HEIGHTS, type DisplaySettings, type Theme } from '../settings';
+import { APP_VERSION } from '../version';
 import { Dialog } from './Dialog';
 
 interface Props {
@@ -57,6 +58,7 @@ export function SettingsDialog({ open, settings, onChange, onClose }: Props) {
           </button>
         </div>
       </div>
+      <p className="small muted version">版 {APP_VERSION}</p>
     </Dialog>
   );
 }

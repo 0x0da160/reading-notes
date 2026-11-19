@@ -12,7 +12,7 @@ const panel = (page: Page) => page.getByRole('dialog', { name: /赤入れ/ });
 
 test('単ページ：選択して赤入れ、Enter は改行のみ、保存で元の位置に戻る', async ({ page }) => {
   await openChapter(page, '第一章　七階と八階のあいだ');
-  await page.getByRole('button', { name: '← 次へ' }).click();
+  await page.getByRole('button', { name: '次へ' }).click();
   const before = await currentLocation(page);
   await selectOnPage(page, 2, 12);
   await page.getByRole('button', { name: '赤入れ', exact: true }).click();
@@ -44,7 +44,7 @@ test('取消は仮表示だけを消す', async ({ page }) => {
 
 test('ページまたぎ：途中ページを含む範囲を一件として保存し、最初のページへ戻る', async ({ page }) => {
   await openChapter(page, '第二章　数える者');
-  await page.getByRole('button', { name: '← 次へ' }).click();
+  await page.getByRole('button', { name: '次へ' }).click();
   const startLoc = await currentLocation(page);
   await selectOnPage(page, 5, 9);
   await page.getByRole('button', { name: '範囲を延ばす' }).click();
@@ -54,8 +54,8 @@ test('ページまたぎ：途中ページを含む範囲を一件として保�
   const box = (await page.locator('.sheet').boundingBox())!;
   await page.mouse.click(box.x + 8, box.y + box.height / 2);
   expect((await currentLocation(page)).page).toBe(startLoc.page);
-  await page.getByRole('button', { name: '← 次', exact: true }).click();
-  await page.getByRole('button', { name: '← 次', exact: true }).click();
+  await page.getByRole('button', { name: '次へ', exact: true }).click();
+  await page.getByRole('button', { name: '次へ', exact: true }).click();
   const endPageLoc = await currentLocation(page);
   await selectOnPage(page, 1, 6);
   await page.getByRole('button', { name: 'ここまで' }).click();
@@ -76,14 +76,14 @@ test('ページまたぎ：途中ページを含む範囲を一件として保�
 test('章（本文ファイル）またぎ：開始章〜終了章を表示する', async ({ page }) => {
   await openChapter(page, '第三章　外縁分館');
   // 前の章の最終ページへ
-  await page.getByRole('button', { name: '前へ →' }).click();
+  await page.getByRole('button', { name: '前へ' }).click();
   const n = await page.evaluate(() => {
     const e = (window as unknown as { __reader: { pageLocation(): { pos: { offset: number } }; list: { section: { text: string } }[]; current: { si: number } } }).__reader;
     return e.list[e.current.si]!.section.text.length - e.pageLocation().pos.offset;
   });
   await selectOnPage(page, Math.max(0, n - 6), n - 1);
   await page.getByRole('button', { name: '範囲を延ばす' }).click();
-  await page.getByRole('button', { name: '← 次', exact: true }).click();
+  await page.getByRole('button', { name: '次へ', exact: true }).click();
   await selectOnPage(page, 0, 10);
   await page.getByRole('button', { name: 'ここまで' }).click();
   await expect(panel(page)).toContainText('第二章　数える者〜第三章　外縁分館');
@@ -94,7 +94,7 @@ test('章（本文ファイル）またぎ：開始章〜終了章を表示す�
 
 test('終点が始点以前なら確定しない', async ({ page }) => {
   await openChapter(page, '第二章　数える者');
-  await page.getByRole('button', { name: '← 次へ' }).click();
+  await page.getByRole('button', { name: '次へ' }).click();
   await selectOnPage(page, 20, 30);
   await page.getByRole('button', { name: '範囲を延ばす' }).click();
   await selectOnPage(page, 2, 8);
@@ -153,15 +153,48 @@ test('ハイライトを隠しても仮表示には影響しない', async ({ pa
 test('範囲指定の途中で回転しても、取消後は開始時のアンカーを含むページへ戻る', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 700 });
   await openChapter(page, '第二章　数える者');
-  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: '← 次へ' }).click();
+  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: '次へ' }).click();
   const anchor = (await currentLocation(page)).pos;
   await selectOnPage(page, 5, 9);
   await page.getByRole('button', { name: '範囲を延ばす' }).click();
-  await page.getByRole('button', { name: '← 次', exact: true }).click();
+  await page.getByRole('button', { name: '次へ', exact: true }).click();
   await page.setViewportSize({ width: 700, height: 390 });
   await page.waitForTimeout(200);
   await page.getByRole('button', { name: '取消' }).click();
   await expect
     .poll(() => page.evaluate((p) => (window as unknown as { __reader: { pageContains(p: unknown): boolean } }).__reader.pageContains(p), anchor))
     .toBe(true);
+});
+
+test('ハイライトをタップするとコメントが出て、ページは送られない。編集もできる', async ({ page }) => {
+  await openChapter(page, '第一章　七階と八階のあいだ');
+  await selectOnPage(page, 2, 12);
+  await page.getByRole('button', { name: '赤入れ', exact: true }).click();
+  await page.getByRole('textbox', { name: 'コメント' }).fill('タップで読める');
+  await page.getByRole('button', { name: '保存' }).click();
+  await expect(panel(page)).toBeHidden();
+  const before = await currentLocation(page);
+  const pt = await page.evaluate(() => {
+    const h = (CSS as unknown as { highlights: Map<string, Set<Range>> }).highlights.get('ann-question')!;
+    const r = [...h][0]!.getClientRects()[0]!;
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  });
+  await page.mouse.click(pt.x, pt.y);
+  const peek = page.getByRole('dialog', { name: '赤入れ' });
+  await expect(peek).toContainText('タップで読める');
+  expect(await currentLocation(page)).toEqual(before);
+  await peek.getByRole('button', { name: '編集' }).click();
+  const box = page.getByRole('textbox', { name: 'コメント' });
+  await expect(box).toHaveValue('タップで読める');
+  await box.fill('書き直した');
+  await page.getByRole('button', { name: '保存' }).click();
+  await expect(panel(page)).toBeHidden();
+  await page.mouse.click(pt.x, pt.y);
+  await expect(page.getByRole('dialog', { name: '赤入れ' })).toContainText('書き直した');
+  await page.keyboard.press('Escape');
+  expect(await currentLocation(page)).toEqual(before);
+  // ハイライトのない場所のタップは、これまでどおりページ送り
+  const sheet = await page.locator('.sheet').boundingBox();
+  await page.mouse.click(sheet!.x + 8, sheet!.y + sheet!.height - 8);
+  await expect.poll(async () => (await currentLocation(page)).pos).not.toEqual(before.pos);
 });
