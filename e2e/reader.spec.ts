@@ -74,7 +74,7 @@ test('左端タップ・右スワイプで次へ、右端タップ・左スワ�
   await swipe(box.x + 200, box.x + 80);
   expect(await at()).toEqual(a);
   // ボタン・キーボード
-  await page.getByRole('button', { name: '← 次へ' }).click();
+  await page.getByRole('button', { name: '次へ' }).click();
   expect(await at()).toEqual(b);
   await page.keyboard.press('ArrowRight');
   expect(await at()).toEqual(a);
@@ -86,7 +86,7 @@ test('文字サイズ・画面サイズを変えても読んでいた本文位�
   await openFile(page, SAMPLE_EPUB);
   await page.getByRole('button', { name: '目次' }).click();
   await page.getByRole('button', { name: '第二章　数える者' }).click();
-  for (let i = 0; i < 5; i++) await page.getByRole('button', { name: '← 次へ' }).click();
+  for (let i = 0; i < 5; i++) await page.getByRole('button', { name: '次へ' }).click();
   const before = (await currentLocation(page)).pos;
   await page.getByRole('button', { name: '設定' }).click();
   await page.getByRole('button', { name: '文字を大きく' }).click();
@@ -137,7 +137,7 @@ test('ナビゲーション文書の目次リンクは通信せずに本文内�
   const w = await watch(page);
   await page.goto('./');
   await openFile(page, SAMPLE_EPUB);
-  await page.getByRole('button', { name: '← 次へ' }).click();
+  await page.getByRole('button', { name: '次へ' }).click();
   const before = w.requests.length;
   await page.locator('.strip[data-section^="s1:"] .internal-link', { hasText: '第三章' }).click();
   await expect(page.locator('.bar-title')).toContainText('第三章');

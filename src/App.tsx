@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { chapterLabel, createAnnotation, makeDraft, sortAnnotations, type Draft } from './annot/build';
-import { highlightSupported, paintAnnotations, paintPreview } from './annot/highlights';
+import { Check, ChevronLeft, ChevronRight, FolderOpen, Highlighter, ListTree, MessageSquareText, MoveHorizontal, Settings, X } from 'lucide-react';
+import { IconButton, IconLabel } from './ui/IconButton';
+import { APP_VERSION } from './version';
+import { annotationsAt, highlightSupported, paintAnnotations, paintPreview } from './annot/highlights';
+import { AnnotationPeek } from './ui/AnnotationPeek';
 import type { Annotation, AnnotationKind } from './annot/types';
 import { LoadError } from './limits';
 import { chapterAt } from './model/bookText';
@@ -43,7 +47,7 @@ type Mode =
   /** 再割り当て：本文から選び直す */
   | { kind: 'reassign-select'; id: string; anchor: ReadingLocation };
 
-type DialogKind = 'toc' | 'settings' | 'list' | 'data' | 'markdown' | 'reassign' | null;
+type DialogKind = 'toc' | 'settings' | 'list' | 'data' | 'markdown' | 'reassign' | 'peek' | null;
 
 export function App() {
   const [settings, setSettings] = useState<DisplaySettings>(loadSettings);
@@ -61,6 +65,7 @@ export function App() {
   const [dialog, setDialog] = useState<DialogKind>(null);
   const [listSelected, setListSelected] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Annotation | null>(null);
+  const [peekIds, setPeekIds] = useState<string[]>([]);
   const [offline, setOffline] = useState<OfflineStatus>({ ready: false, updateWaiting: false });
   const [hasSel, setHasSel] = useState(false);
   const [pendingBackup, setPendingBackup] = useState<number | null>(null);
@@ -342,7 +347,16 @@ export function App() {
     setMode({ kind: 'preview', id: a.id, anchor });
     engine.goToPos(a.range.start);
   };
-  const editFromList = (a: Annotation) => {
+  // 本文のハイライトをタップしたら、その赤入れを見せる（ページ送りしない）
+  const onTapText = (x: number, y: number): boolean => {
+    if (!engine || mode.kind !== 'read' || settings.hideHighlights || !highlightSupported) return false;
+    const hits = annotationsAt(engine, annotations, x, y);
+    if (!hits.length) return false;
+    setPeekIds(hits.map((a) => a.id));
+    setDialog('peek');
+    return true;
+  };
+  const editFromList = (a: Annotation, backToList = true) => {
     if (!engine) return;
     const anchor = mode.kind === 'preview' ? mode.anchor : (readingNow() ?? engine.location());
     setDialog(null);
@@ -351,7 +365,7 @@ export function App() {
       draft: { range: a.range!, quote: a.quote, context: a.context, chapters: a.chapters },
       editing: a,
       anchor,
-      backToList: true,
+      backToList,
     });
   };
   const deleteAnnotation = (a: Annotation) => {
@@ -448,15 +462,11 @@ export function App() {
 
   const navButtons = (
     <>
-      <button type="button" className="btn page-btn" onClick={() => engine?.next()} disabled={!book || state?.atEnd}>
-        ← 次へ
-      </button>
+      <IconButton icon={ChevronLeft} label="次へ" className="page-btn" onClick={() => engine?.next()} disabled={!book || state?.atEnd} />
       <div className="grow progress" aria-live="polite">
         {state ? `${Math.round(state.progress * 100)}%　${state.page + 1} / ${state.pageCount}` : ''}
       </div>
-      <button type="button" className="btn page-btn" onClick={() => engine?.prev()} disabled={!book || state?.atStart}>
-        前へ →
-      </button>
+      <IconButton icon={ChevronRight} label="前へ" className="page-btn" onClick={() => engine?.prev()} disabled={!book || state?.atStart} />
     </>
   );
 
@@ -465,10 +475,10 @@ export function App() {
     footer = (
       <div className="actionbar" role="toolbar" aria-label="選択した範囲の操作">
         <button type="button" className="btn btn-primary" onMouseDown={keepSel} onClick={startAnnotate}>
-          赤入れ
+          <IconLabel icon={Highlighter}>赤入れ</IconLabel>
         </button>
         <button type="button" className="btn btn-outline" onMouseDown={keepSel} onClick={() => startExtend()}>
-          範囲を延ばす
+          <IconLabel icon={MoveHorizontal}>範囲を延ばす</IconLabel>
         </button>
         <span className="status">選択中</span>
       </div>
@@ -476,18 +486,14 @@ export function App() {
   } else if (mode.kind === 'extend') {
     footer = (
       <div className="actionbar" role="toolbar" aria-label="ページまたぎの範囲指定">
-        <button type="button" className="btn btn-outline page-btn" onMouseDown={keepSel} onClick={() => engine?.next()} disabled={state?.atEnd}>
-          ← 次
-        </button>
+        <IconButton icon={ChevronLeft} label="次へ" className="btn-outline page-btn" onMouseDown={keepSel} onClick={() => engine?.next()} disabled={state?.atEnd} />
         <span className="status">終点を選択中</span>
-        <button type="button" className="btn btn-outline page-btn" onMouseDown={keepSel} onClick={() => engine?.prev()} disabled={state?.atStart}>
-          前 →
-        </button>
+        <IconButton icon={ChevronRight} label="前へ" className="btn-outline page-btn" onMouseDown={keepSel} onClick={() => engine?.prev()} disabled={state?.atStart} />
         <button type="button" className="btn btn-outline" onMouseDown={keepSel} onClick={cancelDraft}>
-          取消
+          <IconLabel icon={X}>取消</IconLabel>
         </button>
         <button type="button" className="btn btn-primary" onMouseDown={keepSel} onClick={finishExtend} disabled={!hasSel}>
-          ここまで
+          <IconLabel icon={Check}>ここまで</IconLabel>
         </button>
       </div>
     );
@@ -539,13 +545,9 @@ export function App() {
           </>
         ) : (
           <>
-            <button type="button" className="btn page-btn" onClick={() => engine?.next()} disabled={state?.atEnd}>
-              ← 次
-            </button>
+            <IconButton icon={ChevronLeft} label="次へ" className="page-btn" onClick={() => engine?.next()} disabled={state?.atEnd} />
             <span className="status">割り当てる範囲を長押しで選択</span>
-            <button type="button" className="btn page-btn" onClick={() => engine?.prev()} disabled={state?.atStart}>
-              前 →
-            </button>
+            <IconButton icon={ChevronRight} label="前へ" className="page-btn" onClick={() => engine?.prev()} disabled={state?.atStart} />
           </>
         )}
       </div>
@@ -558,25 +560,17 @@ export function App() {
   return (
     <div className="app">
       <header className="bar">
-        <button type="button" className="btn" onClick={() => fileInput.current?.click()} disabled={loading || mode.kind !== 'read'}>
-          開く
-        </button>
+        <IconButton icon={FolderOpen} label="開く" onClick={() => fileInput.current?.click()} disabled={loading || mode.kind !== 'read'} />
         <div className="grow">
           <h1 className="bar-title">{book ? `${book.title}${chapter ? `　${chapter.title}` : ''}` : '初読の赤入れリーダー'}</h1>
         </div>
         {book && (
           <>
-            <button type="button" className="btn" onClick={() => setDialog('toc')} disabled={mode.kind === 'edit'}>
-              目次
-            </button>
-            <button type="button" className="btn" onClick={() => setDialog('list')} disabled={busyMode}>
-              一覧
-            </button>
+            <IconButton icon={ListTree} label="目次" onClick={() => setDialog('toc')} disabled={mode.kind === 'edit'} />
+            <IconButton icon={MessageSquareText} label="一覧" onClick={() => setDialog('list')} disabled={busyMode} />
           </>
         )}
-        <button type="button" className="btn" onClick={() => setDialog('settings')}>
-          設定
-        </button>
+        <IconButton icon={Settings} label="設定" onClick={() => setDialog('settings')} />
         <input ref={fileInput} type="file" accept={ACCEPT} className="visually-hidden" tabIndex={-1} aria-hidden="true" data-testid="open-manuscript"
           onChange={(e) => {
             const f = e.target.files?.[0];
@@ -655,6 +649,7 @@ export function App() {
             gestures={dialog === null && (mode.kind === 'read' || mode.kind === 'preview' || mode.kind === 'reassign-preview')}
             onEngine={setEngine}
             onState={onState}
+            onTap={onTapText}
           />
         ) : (
           <div className="empty">
@@ -669,6 +664,7 @@ export function App() {
               </button>
             </div>
             {offline.ready && <p className="small">オフラインで開き直せます</p>}
+            <p className="small muted version">{APP_VERSION}</p>
           </div>
         )}
       </main>
@@ -701,6 +697,15 @@ export function App() {
           }}
         />
       )}
+      <AnnotationPeek
+        items={dialog === 'peek' ? peekIds.map((id) => annotations.find((a) => a.id === id)).filter((a): a is Annotation => !!a) : []}
+        onClose={() => setDialog(null)}
+        onEdit={(a) => editFromList(a, false)}
+        onDelete={(a) => {
+          setDialog(null);
+          setConfirmDelete(a);
+        }}
+      />
       <AnnotationList
         open={dialog === 'list'}
         items={sorted}

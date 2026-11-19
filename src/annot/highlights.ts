@@ -49,3 +49,15 @@ export function paintPreview(engine: ReaderEngine | null, range: LogicalRange | 
   h.priority = 10;
   registry.set(NAMES.preview, h);
 }
+
+/** 画面上の点に重なる確定注釈（表示中のページの文字に限る）。重なり順の前面から返す。 */
+export function annotationsAt(engine: ReaderEngine, list: Annotation[], x: number, y: number, slop = 3): Annotation[] {
+  const hits = list.filter(
+    (a) =>
+      a.range &&
+      domRanges(engine, a.range).some((r) =>
+        Array.from(r.getClientRects()).some((b) => x >= b.left - slop && x <= b.right + slop && y >= b.top - slop && y <= b.bottom + slop),
+      ),
+  );
+  return hits.sort((a, b) => PRIORITY[b.kind] - PRIORITY[a.kind]);
+}

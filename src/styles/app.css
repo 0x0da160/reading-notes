@@ -45,9 +45,14 @@ button, input, select, textarea { font: inherit; font-size: max(16px, 1em); colo
 .progress { font-size: 13px; color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
 
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: none;
   min-width: var(--tap);
   min-height: var(--tap);
-  padding: 0 12px;
+  padding: 0 10px;
   border: 1px solid transparent;
   border-radius: var(--radius);
   background: transparent;
@@ -61,6 +66,8 @@ button, input, select, textarea { font: inherit; font-size: max(16px, 1em); colo
 .btn-outline { border-color: var(--control-border); }
 .btn-danger { color: var(--danger); border-color: var(--danger); }
 .page-btn { touch-action: manipulation; font-size: 15px; }
+.btn-icon { padding: 0; width: var(--tap); }
+.btn svg { flex: none; }
 
 .stage {
   position: relative;
@@ -305,3 +312,6 @@ button.ann-item.candidate:hover { border-color: var(--accent); }
 .cand-context { font-family: var(--font-body); line-height: 1.6; overflow-wrap: anywhere; }
 .cand-context mark { background: var(--preview); color: inherit; }
 .list-status { margin: 0 0 8px; color: var(--muted); }
+
+.version { font-variant-numeric: tabular-nums; margin: 8px 0 0; }
+.peek-quote { margin: 0; }

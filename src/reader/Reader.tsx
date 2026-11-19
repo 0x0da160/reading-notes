@@ -11,17 +11,21 @@ interface Props {
   gestures: boolean;
   onEngine: (e: ReaderEngine | null) => void;
   onState: (s: EngineState) => void;
+  /** 本文のタップ。true を返すとページ送りしない（ハイライトのコメント表示に使う） */
+  onTap?: (x: number, y: number) => boolean;
 }
 
 const EDGE_GUARD = 24; // Safari の端ジェスチャーと衝突しないよう、画面端からのスワイプ開始は無視する
 const TAP_ZONE = 0.3;
 
-export function Reader({ book, settings, initial, gestures, onEngine, onState }: Props) {
+export function Reader({ book, settings, initial, gestures, onEngine, onState, onTap }: Props) {
   const sheet = useRef<HTMLDivElement>(null);
   const area = useRef<HTMLDivElement>(null);
   const engine = useRef<ReaderEngine | null>(null);
   const gesturesRef = useRef(gestures);
   gesturesRef.current = gestures;
+  const onTapRef = useRef(onTap);
+  onTapRef.current = onTap;
 
   useLayoutEffect(() => {
     const el = area.current!;
@@ -90,6 +94,7 @@ export function Reader({ book, settings, initial, gestures, onEngine, onState }:
         return;
       }
       if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && dt < 350) {
+        if (onTapRef.current?.(ev.clientX, ev.clientY)) return;
         const rx = (ev.clientX - rect.left) / rect.width;
         if (rx < TAP_ZONE) e.next();
         else if (rx > 1 - TAP_ZONE) e.prev();
