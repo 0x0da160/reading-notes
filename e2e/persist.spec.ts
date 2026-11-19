@@ -236,14 +236,12 @@ test('位置未確定：本文からページをまたいで選び直し、取�
   await page.getByRole('button', { name: '一覧' }).click();
   await page.getByRole('button', { name: '位置を指定' }).click();
   await expect(page.getByText('同じ引用は本文に見つかりませんでした')).toBeVisible();
-  // 取消
+  // 取消すると「位置を指定」に戻り、何も変わらない
   await page.getByRole('button', { name: '本文から選び直す' }).click();
   await page.getByRole('button', { name: '取消' }).click();
-  await page.keyboard.press('Escape');
-  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: '位置を指定' })).toBeVisible();
+  expect((await highlightSizes(page))['ann-question']).toBe(0);
   // ページまたぎで選び直す
-  await page.getByRole('button', { name: '一覧' }).click();
-  await page.getByRole('button', { name: '位置を指定' }).click();
   await page.getByRole('button', { name: '本文から選び直す' }).click();
   await selectOnPage(page, 4, 9);
   await page.getByRole('button', { name: '範囲を延ばす' }).click();
