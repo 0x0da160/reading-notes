@@ -77,6 +77,8 @@ test('JSON：書き出しと、別のブラウザーで同じ原稿を選んで�
   await p2.getByTestId('open-import-manuscript').setInputFiles(SAMPLE_MD);
   await expect(p2.getByRole('alert')).toContainText('版IDがJSONと一致しません');
   await p2.getByTestId('open-json').setInputFiles(asJson(json));
+  // JSON の読込は非同期。ダイアログが出てから原稿を選ぶ（利用者の操作と同じ順序）
+  await expect(p2.getByRole('dialog', { name: '元の原稿を選ぶ' })).toBeVisible();
   await p2.getByTestId('open-import-manuscript').setInputFiles(SAMPLE_EPUB);
   await p2.waitForFunction(() => !!(window as unknown as { __reader?: unknown }).__reader);
   expect((await currentLocation(p2)).pos).toEqual(reading.pos);
