@@ -15,6 +15,8 @@ export function Dialog({ open, title, onClose, children, footer, className }: Pr
   const opener = useRef<Element | null>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+  const openRef = useRef(open);
+  openRef.current = open;
 
   useEffect(() => {
     const d = ref.current;
@@ -32,8 +34,9 @@ export function Dialog({ open, title, onClose, children, footer, className }: Pr
     if (!d) return;
     const handle = () => {
       const o = opener.current;
-      if (o instanceof HTMLElement && o.isConnected) o.focus();
-      onCloseRef.current();
+      if (o instanceof HTMLElement && o.isConnected && !document.querySelector('dialog[open]')) o.focus();
+      // Esc・閉じるボタンなど利用者が閉じた場合だけ知らせる（呼び出し側が閉じた場合は不要）
+      if (openRef.current) onCloseRef.current();
     };
     d.addEventListener('close', handle);
     return () => d.removeEventListener('close', handle);

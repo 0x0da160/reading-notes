@@ -118,10 +118,10 @@ test('Markdown：ルビ・章・生HTMLの扱い', async ({ page }) => {
 test('読み込みエラーでは理由を示し、開いている原稿を保持する', async ({ page }) => {
   await page.goto('./');
   await openFile(page, SAMPLE_MD);
-  await page.locator('input[type=file]').setInputFiles({ name: 'broken.epub', mimeType: 'application/epub+zip', buffer: Buffer.from('not a zip') });
+  await page.getByTestId('open-manuscript').setInputFiles({ name: 'broken.epub', mimeType: 'application/epub+zip', buffer: Buffer.from('not a zip') });
   await expect(page.getByRole('alert')).toContainText('EPUB');
   await expect(page.locator('.bar-title')).toContainText('第一章');
-  await page.locator('input[type=file]').setInputFiles({ name: 'bad.md', mimeType: 'text/markdown', buffer: Buffer.from([0xff, 0xfe, 0x00]) });
+  await page.getByTestId('open-manuscript').setInputFiles({ name: 'bad.md', mimeType: 'text/markdown', buffer: Buffer.from([0xff, 0xfe, 0x00]) });
   await expect(page.getByRole('alert')).toContainText('UTF-8');
 });
 
