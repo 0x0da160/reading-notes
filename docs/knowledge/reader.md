@@ -105,10 +105,10 @@ status: draft
 ### 4.3 iPhone Safariのズーム・横ずれ・キーボード
 
 ```html
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 ```
 
-1. `input`・`textarea`・`select` は `16px` 以上。`user-scalable=no` や `maximum-scale=1` を使わず、利用者のピンチズームを残す。連打するページ送りボタンには `touch-action: manipulation` を限定して使い、本文全体には掛けない。
-2. `100dvh` は通常時のアプリ枠に使えるが、キーボード回避はそれだけに任せない。`visualViewport` の `resize`・`scroll` と高さ・`offsetTop` を用い、入力パネルだけを可視領域に収める。セーフエリアとキーボード余白を二重に加算しない。回転やユーザーの拡大をキーボード挙動と混同しない。
+1. `input`・`textarea`・`select` は `16px` 以上。画面全体を固定し、ピンチズームとダブルタップ拡大は行わない（依頼者の指定）。viewportに `maximum-scale=1, user-scalable=no` を指定し、ルートに `touch-action: pan-x pan-y` を掛け、iOS Safariの `gesture*` イベントを止める。文字の大きさは設定で変える。
+2. アプリ枠は `position: fixed; inset: 0` で可視領域に固定し、`html`・`body` はスクロールさせない。キーボード回避は枠の寸法に任せない。`visualViewport` の `resize`・`scroll` と高さ・`offsetTop` を用い、入力パネルだけを可視領域に収める。セーフエリアとキーボード余白を二重に加算しない。回転やユーザーの拡大をキーボード挙動と混同しない。
 3. 引用・範囲・読書再開位置をフォーカス前に確保する。自動フォーカスで安定しない場合は入力欄を直接タップして開始できること。引用の詳細はパネル内部でスクロールし、保存・キャンセルをキーボードや予測変換欄の裏に隠さない。Enterでは保存せず改行だけを入れ、保存はボタンと ⌘／Ctrl+Enter で行う。SafariではEnterによる変換確定を `isComposing` で確実に判別できないため、Enterに保存を割り当てない。
 4. 横書きUIのフレックス・グリッド子要素に `min-width: 0` を用い、長いファイル名・URL・引用は `overflow-wrap: anywhere` で折り返す。全幅に `100vw` を多用せず、画像は枠に収める。縦書きページ送りの横移動はリーダー内部に閉じ込める。文書全体の `overflow-x: hidden` で本文の欠落やはみ出しを隠さない。

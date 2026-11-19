@@ -154,3 +154,40 @@ test('ダイアログは Esc で閉じ、呼び出し元にフォーカスが戻
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(settings).toBeFocused();
 });
+
+test('画面全体は縦にも横にもスクロールしない（本文表示中・一覧を開いた状態）', async ({ page }) => {
+  await page.goto('./');
+  await openFile(page, SAMPLE_EPUB);
+  const root = () =>
+    page.evaluate(() => {
+      const e = document.scrollingElement!;
+      const cs = getComputedStyle(document.documentElement);
+      return { overflow: e.scrollHeight - e.clientHeight + (e.scrollWidth - e.clientWidth), x: scrollX, y: scrollY, ov: cs.overflow, osb: cs.overscrollBehaviorY };
+    });
+  const tryScroll = async () => {
+    // mobile WebKit はホイールを送れないため、スクロール量を直接与える（はみ出しがなければ動かない）
+    await page.evaluate(() => {
+      window.scrollTo(0, 500);
+      document.scrollingElement!.scrollTop = 500;
+      document.body.scrollTop = 500;
+    });
+    await page.waitForTimeout(100);
+  };
+  await tryScroll();
+  expect(await root()).toEqual({ overflow: 0, x: 0, y: 0, ov: 'hidden', osb: 'none' });
+  await page.getByRole('button', { name: '一覧' }).click();
+  await tryScroll();
+  expect(await root()).toMatchObject({ overflow: 0, x: 0, y: 0 });
+});
+
+test('ピンチやダブルタップで拡大しない設定になっている', async ({ page }) => {
+  await page.goto('./');
+  expect(await page.locator('meta[name=viewport]').getAttribute('content')).toContain('maximum-scale=1, user-scalable=no');
+  await expect(page.locator('html')).toHaveCSS('touch-action', 'pan-x pan-y');
+  const prevented = await page.evaluate(() => {
+    const e = new Event('gesturestart', { cancelable: true, bubbles: true });
+    document.body.dispatchEvent(e);
+    return e.defaultPrevented;
+  });
+  expect(prevented).toBe(true);
+});
