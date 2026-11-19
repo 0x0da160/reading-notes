@@ -165,9 +165,12 @@ test('画面全体は縦にも横にもスクロールしない（本文表示�
       return { overflow: e.scrollHeight - e.clientHeight + (e.scrollWidth - e.clientWidth), x: scrollX, y: scrollY, ov: cs.overflow, osb: cs.overscrollBehaviorY };
     });
   const tryScroll = async () => {
-    await page.mouse.move(200, 300);
-    await page.mouse.wheel(0, 600);
-    await page.evaluate(() => window.scrollTo(0, 500));
+    // mobile WebKit はホイールを送れないため、スクロール量を直接与える（はみ出しがなければ動かない）
+    await page.evaluate(() => {
+      window.scrollTo(0, 500);
+      document.scrollingElement!.scrollTop = 500;
+      document.body.scrollTop = 500;
+    });
     await page.waitForTimeout(100);
   };
   await tryScroll();
