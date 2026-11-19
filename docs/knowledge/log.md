@@ -2,6 +2,7 @@
 
 ## 2026-11-19
 
+* アプリの実装を始め、[検証](./verification.md#section-9-4)に読み込み上限の暫定値を記録した（実機未計測）。
 * Modern Web Guidanceと照合し、次を改めた。
   * [通信・オフライン・公開](./deployment.md#section-8)：原稿のDOMをAPIで組み立て直すことと、`<meta>` のCSP（Trusted Typesを含む）で通信とHTML挿入を制限することを定めた。
   * [位置モデル](./position-model.md#section-6-1)：ハイライトの描画をCSS Custom Highlight APIに確定し、傍線と重なり順の実現方法を定めた。
