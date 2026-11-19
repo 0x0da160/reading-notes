@@ -2,6 +2,11 @@
 
 ## 2026-11-19
 
+* Modern Web Guidanceと照合し、次を改めた。
+  * [通信・オフライン・公開](./deployment.md#section-8)：原稿のDOMをAPIで組み立て直すことと、`<meta>` のCSP（Trusted Typesを含む）で通信とHTML挿入を制限することを定めた。
+  * [位置モデル](./position-model.md#section-6-1)：ハイライトの描画をCSS Custom Highlight APIに確定し、傍線と重なり順の実現方法を定めた。
+  * [リーダーと画面](./reader.md)：`color-scheme` のmeta要素とテーマ設定の同期読込を加え、Enterに保存を割り当てないことで変換確定による誤保存を防いだ。
+  * [実装構成](./architecture.md)：Workerを使わず、長い処理を区切ることにした。
 * サンプルEPUBの構造と配色の計算値を照合し、次を改めた。
   * [実装構成](./architecture.md)：ダイアログをネイティブ `<dialog>` に統一し、UIライブラリを外した。コード分割をやめて必須機能を初期バンドルに入れ、[現在のタブでの継続](./deployment.md#section-8)から準備完了表示の仕組みを省いた。
   * [リーダーと画面](./reader.md)：原稿CSSを使わない場合の段落字下げと縦中横の規則、`rp`・`hidden`・本文中リンク・NCXの扱い、Markdownの章の見出しレベルを定めた。配色トークンを `light-dark()` で一本化し、確定注釈も塗りだけで示さないようにした。
