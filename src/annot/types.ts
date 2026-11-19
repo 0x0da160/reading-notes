@@ -26,6 +26,8 @@ export interface Annotation {
   originalQuote?: string;
   /** 位置未確定の理由 */
   unresolvedReason?: string;
+  /** 位置未確定になる前に記録されていた範囲（候補の並び順に使う。本文には描かない） */
+  staleRange?: LogicalRange;
   createdAt: string;
   updatedAt: string;
 }

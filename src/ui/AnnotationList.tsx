@@ -14,9 +14,11 @@ interface Props {
   onDelete: (a: Annotation) => void;
   onReassign?: (a: Annotation) => void;
   footer?: React.ReactNode;
+  status?: string | null;
+  unbacked?: boolean;
 }
 
-export function AnnotationList({ open, items, selectedId, onClose, onJump, onEdit, onDelete, onReassign, footer }: Props) {
+export function AnnotationList({ open, items, selectedId, onClose, onJump, onEdit, onDelete, onReassign, footer, status, unbacked }: Props) {
   const placed = items.filter((a) => a.range);
   const unresolved = items.filter((a) => !a.range);
   const listRef = useRef<HTMLDivElement>(null);
@@ -64,6 +66,12 @@ export function AnnotationList({ open, items, selectedId, onClose, onJump, onEdi
   return (
     <Dialog open={open} title={`赤入れ一覧（${items.length}件）`} onClose={onClose} footer={footer} className="dlg-wide">
       <div ref={listRef}>
+        {status && (
+          <p className="small list-status">
+            {status}
+            {unbacked && <span className="warn">　未バックアップの変更があります</span>}
+          </p>
+        )}
         {!items.length && <p className="muted">まだ赤入れはありません。本文を長押しして範囲を選び、「赤入れ」を押してください。</p>}
         {placed.length > 0 && <ul className="ann-list">{placed.map(row)}</ul>}
         {unresolved.length > 0 && (
