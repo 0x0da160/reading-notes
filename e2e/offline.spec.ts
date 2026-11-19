@@ -6,7 +6,10 @@ import { SAMPLE_EPUB, SAMPLE_MD, highlightSizes, openFile, selectOnPage, watch }
 // 遮断は、ページからのすべての通信を失敗させるルートで表す（Service Worker が返す応答はネットワークに出ない）。
 const cutNetwork = (context: BrowserContext) => context.route('**/*', (r) => r.abort('internetdisconnected'));
 
-test('通常タブ：「オフラインで開き直せる」の後、通信を切って開き直し、初めての EPUB を読んで赤入れできる', async ({ page, context }) => {
+test('通常タブ：「オフラインで開き直せる」の後、通信を切って開き直し、初めての EPUB を読んで赤入れできる', async ({ page, context, browserName }) => {
+  // Playwright の WebKit では、ルートで遮断したナビゲーションが Service Worker に届く前に止められる
+  // （page.reload: Blocked by Web Inspector）。iPhone 実機の確認は device-checklist.md の項目 7 で行う。
+  test.skip(browserName === 'webkit', 'Playwright WebKit では Service Worker 経由のオフライン再読み込みを再現できない');
   await page.goto('./');
   await expect(page.getByText('オフラインで開き直せます')).toBeVisible({ timeout: 20_000 });
   await cutNetwork(context);
